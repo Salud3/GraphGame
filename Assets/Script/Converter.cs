@@ -14,7 +14,8 @@ public class Converter : MonoBehaviour
     {
         node = nod;
         node.convert = this;
-        DrawLine();
+
+        Invoke("DrawLine", 2);
     }
 
     public void ResetNode()
@@ -29,12 +30,11 @@ public class Converter : MonoBehaviour
             Node nodeA = node;
             foreach (Edge edge in nodeA.GetEdges())
             {
-                Debug.DrawLine(obj.transform.position, this.transform.position, Color.yellow, 2);
+                Debug.DrawLine(obj.transform.position, this.transform.position, Color.yellow, 600);
                 Debug.Log("Line Drwed");
             }
         }
         
-        Invoke("DrawLine", 2);
     }
     public Node GetNode()
     {

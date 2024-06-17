@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class IAMovement : MonoBehaviour
 {
+    public static IAMovement Instance;
     [SerializeField] Rigidbody rg;
+
     [SerializeField] float speed;
     [SerializeField] float MaxForce;
 
@@ -20,6 +22,9 @@ public class IAMovement : MonoBehaviour
 
     void Start()
     {
+        if (Instance == null)
+            Instance = this;
+
         Invoke("InitAll", 0.1f);
     }
 
@@ -32,11 +37,20 @@ public class IAMovement : MonoBehaviour
         InitBusq();
 
     }
-
+    IEnumerator objmas()
+    {
+        yield return new WaitForSeconds(3);
+    }
+    bool canup;
     public void InitBusq()
     {
         GraphMaster.Instance.Regenerate();
-        objCompra++;
+        if (canup)
+        {
+            objCompra++;
+            canup = false;
+            StartCoroutine(objmas());
+        }
         objects.Sort(delegate (Converter n1, Converter n2) { return n1.ID.CompareTo(n2.ID); });
 
         ActNode = GraphMaster.Instance.gameObjects[0].node;
@@ -60,14 +74,15 @@ public class IAMovement : MonoBehaviour
         GraphMaster.Instance.Regenerate();
 
         objCompra++;
-        if (objCompra > ListManager.Instance.buylist.Count)
+        if (objCompra > ListManager.Instance.buylist.Count-1)
         {
             canMove = false;
             Debug.LogWarning("All objectives have been completed.");
             index = 0;
+            GraphMaster.Instance.Regenerate();
+            GraphMaster.Instance.Dijkstras(objects[objCompra-1].node, Salida);
             ActNode = Objective;
             Objective = Salida;
-            GraphMaster.Instance.Dijkstras(ActNode, Salida);
 
 
             PathNodes = GraphMaster.Instance.grafo.GeneratePath(Salida);

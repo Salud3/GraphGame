@@ -14,6 +14,9 @@ public class Graph
     public Graph()
     {
         nodes = new List<Node>();
+    }public void SetFinal(Node f)
+    {
+        final = f;
     }
 
     public Graph(List<Node> nodes)
@@ -33,12 +36,19 @@ public class Graph
         List<Node> pathNodes = new List<Node>();
 
         pathNodes.Add(target);
-
-        while (target != null && target.GetCEdge() != null && target.GetCEdge().GetFromNode() != null)
+        bool search = true;
+        while (search)
         {
-            target = target.GetCEdge().GetFromNode();
-
-            pathNodes.Add(target);
+            if (target != null && target.GetCEdge() != null && target.GetCEdge().GetFromNode() != null)
+            {
+                target = target.GetCEdge().GetFromNode();
+                
+                pathNodes.Add(target);
+            }
+            else
+            {
+                search = false;
+            }
         }
 
         pathNodes.Reverse();
@@ -47,8 +57,9 @@ public class Graph
     }
 
     bool djrunning = false;
-    public void Dijktras(Node inicio, Node meta)
+    public void Dijktras(Node inicio, Node meta)// Astar implementado desde la busqueda de nodo
     {
+        GraphMaster.Instance.Regenerate();
         if (!djrunning)
         {
             Debug.Log(inicio.weight.ToString() + " " + meta.weight.ToString());
@@ -59,7 +70,7 @@ public class Graph
             while (searching)
             {
                 Edge FromEdge = GetNxtEdge();
-
+                //Debug.Log(FromEdge.GetFromNode().convert.ID.ToString() + " apunta a " + FromEdge.GetToNode().convert.ID.ToString());
                 Node next = FromEdge.GetToNode();
 
                 if (next == meta)
@@ -86,52 +97,38 @@ public class Graph
         yield return new WaitForSeconds(1);
         djrunning = false;
     }
-    public void VisitNode(Node visited, float val,Edge fromEdge)
+    public void VisitNode(Node visited, float val, Edge fromEdge)
     {
-        float valo = val;
+        AddEdgesToVisit(visited);
+        float newWeight = val;
 
         if (fromEdge != null)
         {
             fromEdge.SetVisited(true);
-            valo += fromEdge.GetFromNode().GetWeight();//+Heuristica en A*
+            newWeight += fromEdge.GetToNode().GetWeight();
+
         }
 
+        bool isVisited = visited.GetVisit();
+        float currentWeight = visited.GetWeight();
 
-        if (!visited.GetVisit())
+        if (!isVisited || newWeight < currentWeight)
         {
             visited.SetVisit(true);
-            visited.SetWeight(valo);
+            visited.SetWeight(newWeight); // Asigna la heurística en A*
             GraphMaster.Instance.MarkNode(visited);
-
 
             if (fromEdge != null)
             {
                 visited.SetCEdge(fromEdge);
             }
-
-        }
-        else
-        {
-            if (visited > valo)
-            {
-                visited.SetWeight(valo);
-
-                if (fromEdge != null)
-                {
-                    visited.SetCEdge(fromEdge);
-                }
-
-            }
         }
 
-        GetEdgesAlt(visited);
-    
     }
 
-
-    public void GetEdgesAlt(Node n)//Agregamos los Edges del nodo visitado a la lista
+    public void AddEdgesToVisit(Node node)
     {
-        List<Edge> edges = n.edges;
+        List<Edge> edges = node.edges;
 
         foreach (Edge edge in edges)
         {
@@ -140,13 +137,19 @@ public class Graph
                 edgesToVisit.Add(edge);
             }
         }
+        edgesToVisit.Sort(delegate (Edge n1, Edge n2) { return n1.GetWeight().CompareTo(n2.GetWeight()); });
+
+
     }
+
 
     public Edge GetNxtEdge()//Revisamos el Edge hasta arriba de la lista
     {
         Edge edgeTempMax;
         if (edgesToVisit.Count == 0)
         {
+            Debug.Log("edgesToVisit vacio");
+
             return null;
         }
         else
@@ -161,7 +164,6 @@ public class Graph
                 if (edgesToVisit[i] < edgesToVisit[i - 1])
                 {
                     edgeTempMax = edgesToVisit[i];
-                    //calcular distancia para meta A*
                 }
             }
         }

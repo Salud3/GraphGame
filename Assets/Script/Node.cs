@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
+
 [Serializable]
 public class Node
 {
@@ -25,9 +27,13 @@ public class Node
     }
     public void Reset()
     {
+        cEdge = null;
         visited = false;
         weight = 0;
-        cEdge = null;
+        foreach (Edge e in edges)
+        {
+            e.SetVisited(false);
+        }
     }
 
     public void SetConver(Converter conver)
@@ -46,7 +52,24 @@ public class Node
 
     public void SetWeight(float _weight)
     {
-        weight = _weight;
+        if (GameManager.Instance.difficulty == GameManager.Difficulty.HARD)
+        {
+            GameObject gmtemp;
+            if (IAMovement.Instance.objCompra < IAMovement.Instance.objects.Count)
+            {
+                gmtemp = IAMovement.Instance.objects[IAMovement.Instance.objCompra].gameObject;
+            }
+            else
+            {
+                gmtemp = IAMovement.Instance.Salida.convert.gameObject;
+            }
+            weight = _weight + (Math.Abs(convert.gameObject.transform.position.x - GraphMaster.Instance.GetDictNode(gmtemp).convert.transform.position.x) 
+                + Math.Abs(convert.gameObject.transform.position.z - GraphMaster.Instance.GetDictNode(gmtemp).convert.transform.position.z));
+        }
+        else
+        {
+            weight = _weight;
+        }
     }
 
     public float GetWeight()
@@ -92,6 +115,16 @@ public class Node
     public static bool operator < (Node a, float b)
     {
         return a.GetWeight() < b;
+    }
+    
+    public static bool operator >= (Node a, float b)
+    {
+        return a.GetWeight() >= b;
+    }
+
+    public static bool operator <= (Node a, float b)
+    {
+        return a.GetWeight() <= b;
     }
 
 

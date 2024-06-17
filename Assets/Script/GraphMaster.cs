@@ -90,6 +90,8 @@ public class GraphMaster : MonoBehaviour
 
         gameObjects.Sort(delegate (Converter n1, Converter n2) { return n1.ID.CompareTo(n2.ID); });
 
+        grafo.SetFinal(gameObjects[gameObjects.Count - 1].node);
+
         for (int i = 0; i < gameObjects.Count; i++)
         {
             gameObjects[i].SetEdges();
@@ -99,24 +101,8 @@ public class GraphMaster : MonoBehaviour
 
     public void Dijkstras(Node n1, Node n2)
     {
-        switch (GameManager.Instance.difficulty)
-        {
-            case GameManager.Difficulty.MEDIUM:
-                grafo.Dijktras(n1, n2);
-                break;
-            case GameManager.Difficulty.HARD:
-                //grafo.Astar(n1, n2);
-                break;
-            default:
-                grafo.Dijktras(n1, n2);
-                break;
-
-        }
-
+        grafo.Dijktras(n1, n2);
     }
-
-                
-
 
 
 }

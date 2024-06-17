@@ -30,7 +30,7 @@ public class ListManager : MonoBehaviour
         switch (GameManager.Instance.difficulty)
         {
             case GameManager.Difficulty.MEDIUM:
-                rand = Random.Range(1, 2);
+                rand = Random.Range(3, 5);
                 break;
             case GameManager.Difficulty.HARD:
                 rand = Random.Range(4, 9);
@@ -45,7 +45,7 @@ public class ListManager : MonoBehaviour
             int a = Random.Range(0, Stations.Count);
             Addlist(a);
         }
-        buylist.Add(Stations[0]);
+        //buylist.Add(Stations[0]);
 
     }
 
