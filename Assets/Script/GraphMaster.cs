@@ -42,12 +42,18 @@ public class GraphMaster : MonoBehaviour
     public void MarkNode(Node node)
     {
         GameObject nod = nodeMap[node];
-        nod.GetComponent<Renderer>().material.color = Color.green;
+        if (nod.GetComponent<Renderer>() != null && nod.GetComponent<Renderer>().isVisible)
+        {
+            nod.GetComponent<Renderer>().material.color = Color.green;
+        }
     }
     public void MarkNodeR(Node node)
     {
         GameObject nod = nodeMap[node];
-        nod.GetComponent<Renderer>().material.color = Color.red;
+        if (nod.GetComponent<Renderer>() != null && nod.GetComponent<Renderer>().isVisible)
+        {
+            nod.GetComponent<Renderer>().material.color = Color.red;
+        }
     }
 
     private void Start()

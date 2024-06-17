@@ -193,6 +193,7 @@ public class IAMovement : MonoBehaviour
             rg.velocity = des;
         }
 
+        transform.LookAt(Objective.convert.transform);
 
     }
 
