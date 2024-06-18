@@ -11,6 +11,7 @@ public class ListManager : MonoBehaviour
     public List<Converter> buylist;
     public List<string> list;
     public List<Image> buyImglist;
+    public Sprite check;
     public int index = 0;
 
     private void Awake()
@@ -48,9 +49,19 @@ public class ListManager : MonoBehaviour
             Addlist(a);
         }
         //buylist.Add(Stations[0]);
+        
+        indeximg = 0;
 
     }
+    public bool canMove = false;
     int indeximg = 0;
+    int indeximgMax = 0;
+
+    public void SetReady()
+    {
+        canMove = true;
+    }
+
     public void Addlist(int rand)
     {
 
@@ -58,8 +69,21 @@ public class ListManager : MonoBehaviour
         {
             buylist.Add(Stations[rand]);
             list.Add(Stations[rand].Station);
+
             buyImglist[indeximg].sprite = Stations[rand].sprite;
+
+            Stations[rand].col = Stations[rand].transform.GetChild(0).gameObject;
+
+            Stations[rand].col.gameObject.SetActive(true);
+
+            if (GameManager.Instance.difficulty == GameManager.Difficulty.HARD)
+            {
+                Stations[rand].col.GetComponent<ObjRef>().arrow = Stations[rand].col.transform.GetChild(0).gameObject;
+                Stations[rand].col.GetComponent<ObjRef>().arrow.SetActive(false);
+            }
+
             indeximg++;
+            indeximgMax = indeximg;
         }
         else
         {
@@ -67,7 +91,47 @@ public class ListManager : MonoBehaviour
         }
     }
 
+    public void checkObj(Converter ID)
+    {   
+        for (int i = 0; i < buylist.Count; i++)
+        {
+            if (ID == buylist[i])
+            {
+                foreach(Image img in buyImglist)
+                {
+                    if (img.sprite == ID.sprite)
+                    {
+                        img.sprite = check;
+                        break;
 
+                    }
+                }
+                break;
+            }
+        }
+
+    } 
+    public void removeObj(Converter ID)
+    {   
+        for (int i = 0; i < buylist.Count; i++)
+        {
+            if (ID == buylist[i])
+            {
+                foreach(Image img in buyImglist)
+                {
+                    if (img.sprite == ID.sprite)
+                    {
+                        img.gameObject.SetActive(false);
+                        Debug.Log("Removed");
+                        break;
+
+                    }
+                }
+                break;
+            }
+        }
+
+    } 
 
 
 

@@ -10,6 +10,8 @@ public class Converter : MonoBehaviour
     public Node node;
     public Converter[] conexion;
     public Sprite sprite;
+    public GameObject col;
+
 
     public void SetNode(Node nod)
     {

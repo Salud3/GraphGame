@@ -7,6 +7,8 @@ public class UIController : MonoBehaviour
 {
     [SerializeField] Animator FondoNegro;
 
+
+
     public void SetDiffMed()
     {
         GameManager.Instance.difficulty = GameManager.Difficulty.MEDIUM;

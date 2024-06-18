@@ -18,14 +18,28 @@ public class IAMovement : MonoBehaviour
     public List<Node> PathNodes = new List<Node>();//Nodos por recorrer de punto A a punto B
     public int objCompra = -1; // index del objeto que va a buscar de la lista
     public int index;//index de los nodos en el path
-    public bool canMove = false;
+    public bool generated = false;
 
     void Start()
     {
         if (Instance == null)
             Instance = this;
-
+        anim = transform.GetChild(0).GetComponent<Animator>();
         Invoke("InitAll", 0.1f);
+
+        switch (GameManager.Instance.difficulty)
+        {
+            case GameManager.Difficulty.MEDIUM:
+                speed = 25.8f;
+                break;
+            case GameManager.Difficulty.HARD:
+                speed = 30f;
+                break;
+            default:
+                speed = 25.8f;
+                break;
+        }
+
     }
 
     public void InitAll()
@@ -66,7 +80,7 @@ public class IAMovement : MonoBehaviour
 
         PathNodes = GraphMaster.Instance.grafo.GeneratePath(meta);
         Objective = PathNodes[index];
-        canMove = true;
+        generated = true;
     }
     Node meta2;
     public void InitBusq(int a)
@@ -74,15 +88,17 @@ public class IAMovement : MonoBehaviour
         GraphMaster.Instance.Regenerate();
 
         objCompra++;
+        speed++;
         if (objCompra > ListManager.Instance.buylist.Count-1)
         {
-            canMove = false;
+            generated = false;
             Debug.LogWarning("All objectives have been completed.");
             index = 0;
             GraphMaster.Instance.Regenerate();
             GraphMaster.Instance.Dijkstras(objects[objCompra-1].node, Salida);
             ActNode = Objective;
             Objective = Salida;
+            GameControl.Instance.fin[0].GetComponent<Collider>().isTrigger = true;
 
 
             PathNodes = GraphMaster.Instance.grafo.GeneratePath(Salida);
@@ -91,12 +107,12 @@ public class IAMovement : MonoBehaviour
             {
                 index = 0;
                 Objective = PathNodes[index];
-                canMove = true;
+                generated = true;
             }
             else
             {
                 Debug.LogError("Failed to generate a valid path.");
-                canMove = false;
+                generated = false;
             }
 
             return;
@@ -121,20 +137,25 @@ public class IAMovement : MonoBehaviour
         {
             index = 0;
             Objective = PathNodes[index];
-            canMove = true;
+            generated = true;
         }
         else
         {
             Debug.LogError("Failed to generate a valid path.");
-            canMove = false;
+            generated = false;
         }
     }
 
+    public bool CanMove()
+    {
+        return ListManager.Instance.canMove;
+    }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (canMove)
+        anim.SetBool("Walking",generated);
+        if (generated && CanMove())
         {
             if (Vector3.Distance(this.transform.position, Objective.convert.transform.position) < 0.8f)
             {
@@ -153,7 +174,7 @@ public class IAMovement : MonoBehaviour
                 }
                 else
                 {
-                    canMove = false;
+                    generated = false;
                     InitBusq(0);
 
                 }
@@ -166,11 +187,11 @@ public class IAMovement : MonoBehaviour
     }
 
 
+    Animator anim;
     Vector3 CurrentVel= new Vector3 (01, 0, 01);
     void Movement()
     {
         Vector3 FinalCurrent = new Vector3();
-
         Vector3 des = DesiredVel();
         Debug.DrawLine(this.transform.position, this.transform.position+des, Color.red,0.01f);
 
@@ -194,7 +215,6 @@ public class IAMovement : MonoBehaviour
         }
 
         transform.LookAt(Objective.convert.transform);
-
     }
 
     public float radius = .5f;
@@ -237,8 +257,10 @@ public class IAMovement : MonoBehaviour
     {
         if (other.tag == "Finish")
         {
-            canMove = false;
+            generated = false;
+
             GameManager.Instance.SetLose();
+            GameControl.Instance.Finish();
         }
     }
 

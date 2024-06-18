@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        difficulty = Difficulty.MEDIUM;
+        //difficulty = Difficulty.MEDIUM;
         if (Instance == null)
         {
             Instance = this;
@@ -23,6 +23,11 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this);
         }
+    }
+    private void Start()
+    {
+        AudioManager.Instance.ChargeMusicLevel();
+
     }
     public bool GetWin()
     {
@@ -36,26 +41,29 @@ public class GameManager : MonoBehaviour
     {
         if (lose)
         {
-            win = true;
+            win = false;
         }
         else
         {
-            win = false;
+            win = true;
         }
     }
     public void SetLose()
     {
         if (win)
         {
-            lose = true;
+            lose = false;
         }
         else
         {
-            lose = false;
+            lose = true;
         }
     }
 
-
+    public void AutoDestruction()
+    {
+        Destroy(gameObject);
+    }
     //Aqui son cargas de scena
     public void Loadscene()
     {
